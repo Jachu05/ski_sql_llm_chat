@@ -1,1 +1,1 @@
-# ski_sql_lmm_chat
+# ski_sql_llm_chat
