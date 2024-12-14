@@ -22,15 +22,9 @@ if prompt := st.chat_input("What is up?"):
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        stream = st.session_state.llm.stream(
+        response = st.session_state.llm.invoke(
             {"messages": [HumanMessage(prompt)]},
             st.session_state.config,
-            stream_mode="messages",
         )
-
-        def format_stream(stream):
-            for message, _ in stream:
-                yield message.content
-
-        response = st.write_stream(format_stream(stream))
+        st.markdown(response['messages'][-1].content)
         
