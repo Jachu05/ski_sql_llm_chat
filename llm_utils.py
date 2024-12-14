@@ -40,6 +40,9 @@ def get_app():
 
         content: Literal["generate_answer", "search_db_and_answer"]
 
+    # maybe not that necessary if this is a chain...
+    # better would be to use query translation to transform question to be better suited for agent
+    # e.g. depends on abstraction to 
     def should_seek_in_db(state: State) -> Literal["generate_answer", "write_query"]:
         """Check if prompt requires to look for some information in database. 
         If yes look for them, if not generate answer only from llm"""
@@ -63,6 +66,8 @@ def get_app():
             return "generate_answer"
         return "write_query"
 
+    # change it to tool
+    # other more specyfic tools could be added e.g. weather tool that will take info from db and from internet
     def write_query(state: State):
         """Generate SQL query to fetch information."""
         prompt_template = ChatPromptTemplate.from_messages(
@@ -92,6 +97,7 @@ def get_app():
         response = chain.invoke({'messages': state.messages})
         return response
 
+    # instead of error better would be validates query according to the question asked ect.
     def rewrite_error_query(state: State):
         query_check_system = f"""
             You are a SQL expert with a strong attention to detail.
@@ -123,6 +129,9 @@ def get_app():
         execute_query_tool = QuerySQLDataBaseTool(db=db)
         return {"result": execute_query_tool.invoke(state.query.replace('\\', ''))}
 
+    # would be good to make to self reflecting, check if the answer asnwers the question, if the query
+    # is correct according to question. 
+    # add chat history database, message cleanup like trim, summary
     def generate_answer(state: State):
         """Answer question using retrieved information as context."""
         prompt_template = ChatPromptTemplate.from_messages(
